@@ -23,7 +23,6 @@ public class PenyewaanDao {
         }
     }
 
-    /** @return penyewaan, atau null jika kode tidak ditemukan */
     public Penyewaan findByKode(String kodeSewa) {
         try (EntityManager em = ambilEntityManager()) {
             return em.find(Penyewaan.class, kodeSewa);
@@ -48,7 +47,6 @@ public class PenyewaanDao {
         }
     }
 
-    /** Simpan perubahan customer, kamera, tipe sewa, dan durasi. @return false jika kode tidak ditemukan */
     public boolean update(Penyewaan p) {
         EntityManager em = ambilEntityManager();
         try {
@@ -69,7 +67,6 @@ public class PenyewaanDao {
         }
     }
 
-    /** @return false jika kode tidak ditemukan */
     public boolean delete(String kodeSewa) {
         EntityManager em = ambilEntityManager();
         try {

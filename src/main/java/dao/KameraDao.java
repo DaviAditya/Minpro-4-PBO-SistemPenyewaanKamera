@@ -23,7 +23,6 @@ public class KameraDao {
         }
     }
 
-    /** @return kamera, atau null jika ID tidak ditemukan */
     public Kamera findById(int idKamera) {
         try (EntityManager em = ambilEntityManager()) {
             return em.find(Kamera.class, idKamera);

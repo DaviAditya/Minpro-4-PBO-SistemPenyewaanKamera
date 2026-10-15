@@ -54,7 +54,7 @@ public class Service {
     // Create
     public Penyewaan tambahPenyewaan(String kodeSewa, String idCust, String namaCust, String noTelp,
                                  int idKamera, TipeSewa tipeSewa, int durasi) {
-        // Validasi dulu sebelum ada yang ditulis ke database
+        // Validasi sebelum ke database
         Kamera kameraDipilih = cariKamera(idKamera);
         if (kameraDipilih == null) {
             throw new IllegalArgumentException("ID Kamera tidak ditemukan!");
@@ -64,7 +64,6 @@ public class Service {
             throw new IllegalArgumentException("Kode sewa " + sewaBaru.getKodeSewa() + " sudah dipakai!");
         }
 
-        // Customer: baru -> insert; sudah ada -> nama & no. telp diperbarui sesuai input
         if (customerDao.findById(sewaBaru.getIdCust()) == null) {
             customerDao.insert(sewaBaru.getCustomer());
         } else {

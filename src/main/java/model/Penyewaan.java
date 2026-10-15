@@ -39,7 +39,6 @@ public class Penyewaan {
 
     private int durasi;
 
-    // Wajib ada untuk Hibernate
     protected Penyewaan() {
     }
     

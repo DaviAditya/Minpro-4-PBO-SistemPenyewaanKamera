@@ -23,7 +23,6 @@ public class CustomerDao {
         }
     }
 
-    /** @return customer, atau null jika ID tidak ditemukan */
     public Customer findById(String idCust) {
         try (EntityManager em = ambilEntityManager()) {
             return em.find(Customer.class, idCust);
@@ -48,7 +47,7 @@ public class CustomerDao {
         }
     }
 
-    /** Simpan perubahan nama & no. telp. @return false jika ID tidak ditemukan */
+    // Update
     public boolean update(Customer c) {
         EntityManager em = ambilEntityManager();
         try {

@@ -32,13 +32,11 @@ public abstract class Kamera implements Disewakan {
     @Column(name = "harga_sewa_per3jam")
     private double hargaSewa;
 
-    // Isinya beda tiap jenis: tipe lensa (DSLR), fitur 4K (Mirrorless), efek retro (DigiCam)
     @Column(name = "atribut_tambahan")
     private String atribut;
 
     private int stok;
 
-    // Wajib ada untuk Hibernate
     protected Kamera() {
     }
 
