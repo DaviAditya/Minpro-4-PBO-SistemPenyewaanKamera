@@ -9,8 +9,8 @@ package model;
  * @author Dovs
  */
 public enum TipeSewa {
-    PER_3_JAM("Per 3 Jam"),
-    HARIAN("Harian");
+    Harian("Harian"),
+    per3jam("Per 3 Jam");
 
     private final String label;
 

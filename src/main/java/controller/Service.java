@@ -3,101 +3,96 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package controller;
-import java.util.ArrayList;
-import model.DigiCam;
+import dao.CustomerDao;
+import dao.KameraDao;
+import dao.PenyewaanDao;
+import java.util.List;
+import model.Customer;
 import model.Kamera;
-import model.KameraDslr;
-import model.KameraMirorrless;
 import model.Penyewaan;
 import model.TipeSewa;
+/**
 /**
  *
  * @author Dovs
  */
 public class Service {
-    private final ArrayList<Penyewaan> daftarSewa = new ArrayList<>();
-    private final ArrayList<Kamera> daftarKamera = new ArrayList<>();
-
+    private final KameraDao kameraDao;
+    private final CustomerDao customerDao;
+    private final PenyewaanDao penyewaanDao;
     public Service() {
-        initDummyData();
+        this(new KameraDao(), new CustomerDao(), new PenyewaanDao()); 
     }
-
-    private void initDummyData() {
-        Kamera dslr1 = new KameraDslr(101, "Canon EOS 80D", 75000, "18-135mm IS USM");
-        Kamera dslr2 = new KameraDslr(102, "Canon EOS 600D", 50000, "18-35mm IS II");
-        Kamera mirrorless1 = new KameraMirorrless(103, "Sony A6400", 90000, true);
-        Kamera digicam1 = new DigiCam(104, "Canon IXY 650", 40000, "Vintage Film Warm");
-        Kamera digicam2 = new DigiCam(105, "Sony Cyber-shot WX350", 45000, "Retro Soft");
-
-        daftarKamera.add(dslr1);
-        daftarKamera.add(dslr2);
-        daftarKamera.add(mirrorless1);
-        daftarKamera.add(digicam1);
-        daftarKamera.add(digicam2);
-
-        daftarSewa.add(new Penyewaan("S001", "C01", "Davi Aditya", "081234567890", dslr1, TipeSewa.PER_3_JAM, 2));
-        daftarSewa.add(new Penyewaan("S002", "C02", "Riaz Ramadhan", "089876543210", mirrorless1, TipeSewa.PER_3_JAM, 1));
-        daftarSewa.add(new Penyewaan("S003", "C03", "Indah Marlina", "089822113412", digicam1, TipeSewa.HARIAN, 1));
+    public Service(KameraDao kameraDao, CustomerDao customerDao, PenyewaanDao penyewaanDao) {
+        this.kameraDao = kameraDao;
+        this.customerDao = customerDao;
+        this.penyewaanDao = penyewaanDao;
     }
-
     // Getter
-    public ArrayList<Kamera> getDaftarKamera() {
-        return daftarKamera;
+    public List<Kamera> getDaftarKamera() {
+        return kameraDao.findAll();
     }
-
-    public ArrayList<Penyewaan> getDaftarSewa() {
-        return daftarSewa;
+    public List<Customer> getDaftarCustomer() {
+        return customerDao.findAll();
     }
-
+    public List<Penyewaan> getDaftarSewa() {
+        return penyewaanDao.findAll();
+    }
     // Pencarian
     public Kamera cariKamera(int idKamera) {
-        for (Kamera k : daftarKamera) {
-            if (k.getIdKamera() == idKamera) {
-                return k;
-            }
-        }
-        return null;
+        return kameraDao.findById(idKamera);
+    }
+
+    public Customer cariCustomer(String idCust) {
+        return customerDao.findById(idCust.trim());
     }
 
     public Penyewaan cariSewa(String kodeSewa) {
-        for (Penyewaan p : daftarSewa) {
-            if (p.getKodeSewa().equalsIgnoreCase(kodeSewa)) {
-                return p;
-            }
-        }
-        return null;
+        return penyewaanDao.findByKode(kodeSewa.trim());
     }
 
     // Create
     public Penyewaan tambahPenyewaan(String kodeSewa, String idCust, String namaCust, String noTelp,
                                  int idKamera, TipeSewa tipeSewa, int durasi) {
-    Kamera kameraDipilih = cariKamera(idKamera);
-    if (kameraDipilih == null) {
-        throw new IllegalArgumentException("ID Kamera tidak ditemukan!");
+        // Validasi dulu sebelum ada yang ditulis ke database
+        Kamera kameraDipilih = cariKamera(idKamera);
+        if (kameraDipilih == null) {
+            throw new IllegalArgumentException("ID Kamera tidak ditemukan!");
+        }
+        Penyewaan sewaBaru = new Penyewaan(kodeSewa, idCust, namaCust, noTelp, kameraDipilih, tipeSewa, durasi);
+        if (penyewaanDao.findByKode(sewaBaru.getKodeSewa()) != null) {
+            throw new IllegalArgumentException("Kode sewa " + sewaBaru.getKodeSewa() + " sudah dipakai!");
+        }
+
+        // Customer: baru -> insert; sudah ada -> nama & no. telp diperbarui sesuai input
+        if (customerDao.findById(sewaBaru.getIdCust()) == null) {
+            customerDao.insert(sewaBaru.getCustomer());
+        } else {
+            customerDao.update(sewaBaru.getCustomer());
+        }
+        penyewaanDao.insert(sewaBaru);
+        return sewaBaru;
     }
-    Penyewaan sewaBaru = new Penyewaan(kodeSewa, idCust, namaCust, noTelp, kameraDipilih, tipeSewa, durasi);
-    daftarSewa.add(sewaBaru);
-    return sewaBaru;
-}
 
     // Delete
     public boolean batalPenyewaan(String kodeSewa) {
-        Penyewaan p = cariSewa(kodeSewa);
-        if (p == null) {
-            return false;
-        }
-        daftarSewa.remove(p);
-        return true;
+        return penyewaanDao.delete(kodeSewa.trim());
     }
-    
+
     // Update
     public boolean updateIdCustomer(String kodeSewa, String idCustBaru) {
         Penyewaan p = cariSewa(kodeSewa);
         if (p == null) {
             return false;
         }
-        p.setIdCust(idCustBaru);
-        return true;
+        Customer baru = customerDao.findById(idCustBaru.trim());
+        if (baru == null) {
+            // ID belum terdaftar: buat customer baru dengan nama & no. telp yang sama
+            baru = new Customer(idCustBaru, p.getNamaCust(), p.getNoTelp());
+            customerDao.insert(baru);
+        }
+        p.setCustomer(baru);
+        return penyewaanDao.update(p);
     }
 
     public boolean updateNamaCustomer(String kodeSewa, String namaCustBaru) {
@@ -106,7 +101,7 @@ public class Service {
             return false;
         }
         p.setNamaCust(namaCustBaru);
-        return true;
+        return customerDao.update(p.getCustomer());
     }
 
     public boolean updateNoTelepon(String kodeSewa, String noTelpBaru) {
@@ -115,7 +110,7 @@ public class Service {
             return false;
         }
         p.setNoTelp(noTelpBaru);
-        return true;
+        return customerDao.update(p.getCustomer());
     }
 
     public boolean updateKamera(String kodeSewa, int idKameraBaru) {
@@ -125,7 +120,7 @@ public class Service {
             return false;
         }
         p.setKamera(kameraBaru);
-        return true;
+        return penyewaanDao.update(p);
     }
 
     public boolean updateDurasi(String kodeSewa, TipeSewa tipeBaru, int durasiBaru) {
@@ -135,6 +130,6 @@ public class Service {
         }
         p.setTipeSewa(tipeBaru);
         p.setDurasi(durasiBaru);
-        return true;
+        return penyewaanDao.update(p);
     }
 }

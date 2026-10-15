@@ -3,25 +3,33 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package model;
+import jakarta.persistence.DiscriminatorValue;
+import jakarta.persistence.Entity;
 
 /**
  *
  * @author Dovs
  */
+@Entity
+@DiscriminatorValue("Mirrorless")
 public class KameraMirorrless extends Kamera {
-    private boolean adaFitur4K;
-    
-    public KameraMirorrless(int idKamera, String namaKamera, double hargaSewa, boolean adaFitur4K){
-        super(idKamera, namaKamera, hargaSewa);
-        this.adaFitur4K = adaFitur4K;
-        }
+
+    protected KameraMirorrless() {
+    }
+
+    public KameraMirorrless(int idKamera, String namaKamera, double hargaSewa, boolean adaFitur4K) {
+        super(idKamera, namaKamera, hargaSewa, String.valueOf(adaFitur4K));
+    }
+
     public boolean isAdaFitur4K() {
-        return adaFitur4K;
+        String nilai = getAtribut() == null ? "" : getAtribut().trim();
+        return nilai.equalsIgnoreCase("true");
     }
 
     public void setAdaFitur4K(boolean adaFitur4K) {
-        this.adaFitur4K = adaFitur4K;
+        setAtribut(String.valueOf(adaFitur4K));
     }
+
     @Override
     public String getJenisKamera() {
         return "Mirrorless";
@@ -29,6 +37,6 @@ public class KameraMirorrless extends Kamera {
 
     @Override
     public String getSpesifikasi() {
-        return "Fitur 4K: " + (adaFitur4K ? "Ya" : "Tidak");
+        return "Fitur 4K: " + (isAdaFitur4K() ? "Ya" : "Tidak");
     }
 }

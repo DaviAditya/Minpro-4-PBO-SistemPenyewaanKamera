@@ -3,25 +3,30 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package model;
+import jakarta.persistence.DiscriminatorValue;
+import jakarta.persistence.Entity;
 
 /**
  *
  * @author Dovs
  */
-public final class KameraDslr extends Kamera {
-    private String tipeLensa;
+@Entity
+@DiscriminatorValue("DSLR")
+public class KameraDslr extends Kamera {
+
+    protected KameraDslr() {
+    }
 
     public KameraDslr(int idKamera, String namaKamera, double hargaSewa, String tipeLensa) {
-        super(idKamera, namaKamera, hargaSewa);
-        this.tipeLensa = tipeLensa;
+        super(idKamera, namaKamera, hargaSewa, tipeLensa);
     }
 
     public String getTipeLensa() {
-        return tipeLensa;
+        return getAtribut();
     }
 
     public void setTipeLensa(String tipeLensa) {
-        this.tipeLensa = tipeLensa;
+        setAtribut(tipeLensa);
     }
 
     @Override
@@ -31,6 +36,6 @@ public final class KameraDslr extends Kamera {
 
     @Override
     public String getSpesifikasi() {
-        return "Tipe Lensa: " + tipeLensa;
+        return "Tipe Lensa: " + getTipeLensa();
     }
 }

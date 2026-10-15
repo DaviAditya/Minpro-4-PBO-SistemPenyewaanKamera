@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/XML/XMLDocument.xml to edit this template
+-->
+<persistence xmlns="https://jakarta.ee/xml/ns/persistence" version="3.0">
+    <persistence-unit name="penyewaankameraPU">
+        <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+
+        <!-- Daftar class model yang jadi tabel -->
+        <class>model.Customer</class>
+        <class>model.Kamera</class>
+        <class>model.KameraDslr</class>
+        <class>model.KameraMirorrless</class>
+        <class>model.DigiCam</class>
+        <class>model.Penyewaan</class>
+
+        <properties>
+            <!-- Konfigurasi Database JDBC -->
+            <property name="jakarta.persistence.jdbc.driver" value="com.mysql.cj.jdbc.Driver"/>
+            <property name="jakarta.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/penyewaankamera"/>
+            <property name="jakarta.persistence.jdbc.user" value="root"/>
+            <property name="jakarta.persistence.jdbc.password" value=""/>
+
+            <!-- Hibernate Settings -->
+            <property name="hibernate.dialect" value="org.hibernate.dialect.MySQLDialect"/>
+            <!-- update: otomatis bikin tabel jika belum ada di database -->
+            <property name="hibernate.hbm2ddl.auto" value="none"/>
+            <!-- show_sql: menampilkan SQL yang di-generate ORM di terminal -->
+            <property name="hibernate.show_sql" value="false"/>
+            <property name="hibernate.format_sql" value="false"/>
+        </properties>
+    </persistence-unit>
+</persistence>
+

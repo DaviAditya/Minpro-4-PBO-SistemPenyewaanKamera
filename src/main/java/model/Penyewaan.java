@@ -3,30 +3,55 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package model;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 
 /**
  *
  * @author Dovs
  */
+@Entity
+@Table(name = "penyewaan")
 public class Penyewaan {
-    private final String kodeSewa;
+    @Id
+    @Column(name = "kode_sewa")
+    private String kodeSewa;
 
-    // Attribute Customer
-    private String idCust;
-    private String namaCust;
-    private String noTelp;
+    // Banyak penyewaan bisa dimiliki satu customer
+    @ManyToOne
+    @JoinColumn(name = "id_cust")
+    private Customer customer;
 
-    // Attribute Penyewaan
+    // Banyak penyewaan bisa memakai satu kamera
+    @ManyToOne
+    @JoinColumn(name = "id_kamera")
     private Kamera kamera;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "tipe_sewa")
     private TipeSewa tipeSewa;
+
     private int durasi;
 
+    // Wajib ada untuk Hibernate
+    protected Penyewaan() {
+    }
+    
     public Penyewaan(String kodeSewa, String idCust, String namaCust, String noTelp,
                      Kamera kamera, TipeSewa tipeSewa, int durasi) {
+        this(kodeSewa, new Customer(idCust, namaCust, noTelp), kamera, tipeSewa, durasi);
+    }
+
+    public Penyewaan(String kodeSewa, Customer customer,
+                     Kamera kamera, TipeSewa tipeSewa, int durasi) {
         this.kodeSewa = validasiTeks(kodeSewa, "Kode sewa");
-        setIdCust(idCust);
-        setNamaCust(namaCust);
-        setNoTelp(noTelp);
+        setCustomer(customer);
         setKamera(kamera);
         setTipeSewa(tipeSewa);
         setDurasi(durasi);
@@ -45,31 +70,36 @@ public class Penyewaan {
         return kodeSewa;
     }
 
-    public String getIdCust() {
-        return idCust;
+    public Customer getCustomer() {
+        return customer;
     }
 
-    public void setIdCust(String idCust) {
-        this.idCust = validasiTeks(idCust, "ID customer");
+    public void setCustomer(Customer customer) {
+        if (customer == null) {
+            throw new IllegalArgumentException("Customer tidak boleh kosong!");
+        }
+        this.customer = customer;
+    }
+
+    // Pintasan ke data customer (dipakai View)
+    public String getIdCust() {
+        return customer.getIdCust();
     }
 
     public String getNamaCust() {
-        return namaCust;
+        return customer.getNamaCust();
     }
 
     public void setNamaCust(String namaCust) {
-        this.namaCust = validasiTeks(namaCust, "Nama customer");
+        customer.setNamaCust(namaCust);
     }
 
     public String getNoTelp() {
-        return noTelp;
+        return customer.getNoTelp();
     }
 
     public void setNoTelp(String noTelp) {
-        if (noTelp == null || !noTelp.trim().matches("\\d+")) {
-            throw new IllegalArgumentException("Nomor telepon harus berupa angka!");
-        }
-        this.noTelp = noTelp.trim();
+        customer.setNoTelp(noTelp);
     }
 
     public Kamera getKamera() {
@@ -106,7 +136,7 @@ public class Penyewaan {
     }
 
     public String getDeskripsiDurasi() {
-        if (tipeSewa == TipeSewa.HARIAN) {
+        if (tipeSewa == TipeSewa.Harian) {
             return durasi + " hari";
         }
         return durasi + " paket (" + (durasi * 3) + " jam)";

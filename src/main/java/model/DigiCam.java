@@ -3,25 +3,30 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package model;
+import jakarta.persistence.DiscriminatorValue;
+import jakarta.persistence.Entity;
 
 /**
  *
  * @author Dovs
  */
-public final class DigiCam extends Kamera {
-    private String efekRetro;
+@Entity
+@DiscriminatorValue("DigiCam")
+public class DigiCam extends Kamera {
+
+    protected DigiCam() {
+    }
 
     public DigiCam(int idKamera, String namaKamera, double hargaSewa, String efekRetro) {
-        super(idKamera, namaKamera, hargaSewa);
-        this.efekRetro = efekRetro;
+        super(idKamera, namaKamera, hargaSewa, efekRetro);
     }
 
     public String getEfekRetro() {
-        return efekRetro;
+        return getAtribut();
     }
 
     public void setEfekRetro(String efekRetro) {
-        this.efekRetro = efekRetro;
+        setAtribut(efekRetro);
     }
 
     @Override
@@ -31,6 +36,6 @@ public final class DigiCam extends Kamera {
 
     @Override
     public String getSpesifikasi() {
-        return "Efek Retro: " + efekRetro;
+        return "Efek Retro: " + getEfekRetro();
     }
 }

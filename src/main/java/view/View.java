@@ -4,11 +4,12 @@
  */
 package view;
 import controller.Service;
+import java.util.List;
 import java.util.Scanner;
+import konfig.DatabaseException;
 import model.Kamera;
 import model.Penyewaan;
 import model.TipeSewa;
-
 /**
  *
  * @author Dovs
@@ -27,26 +28,31 @@ public class View {
             tampilkanMenu();
             int pilihan = inputAngka("Silahkan Input menu (1-5): ");
 
-            switch (pilihan) {
-                case 1:
-                    menuBooking();
-                    break;
-                case 2:
-                    tampilkanSemuaSewa();
-                    break;
-                case 3:
-                    menuBatal();
-                    break;
-                case 4:
-                    menuUpdate();
-                    break;
-                case 5:
-                    running = false;
-                    System.out.println("\nTerima Kasih telah menggunakan sistem ini! See uu nekstaym");
-                    break;
-                default:
-                    System.out.println("\nError!! Pilihan tidak valid!");
-                    break;
+            try {
+                switch (pilihan) {
+                    case 1:
+                        menuBooking();
+                        break;
+                    case 2:
+                        tampilkanSemuaSewa();
+                        break;
+                    case 3:
+                        menuBatal();
+                        break;
+                    case 4:
+                        menuUpdate();
+                        break;
+                    case 5:
+                        running = false;
+                        System.out.println("\nTerima Kasih telah menggunakan sistem ini! See uu nekstaym");
+                        break;
+                    default:
+                        System.out.println("\nError!! Pilihan tidak valid!");
+                        break;
+                }
+            } catch (DatabaseException e) {
+                // Error database tidak menghentikan program
+                System.out.println("\nError Database!! " + e.getMessage());
             }
         }
         scanner.close();
@@ -83,11 +89,12 @@ public class View {
 
     private void tampilkanSemuaSewa() {
         System.out.println("\n=== DAFTAR TRANSAKSI PENYEWAAN ===");
-        if (service.getDaftarSewa().isEmpty()) {
+        List<Penyewaan> daftarSewa = service.getDaftarSewa(); // satu kali query ke database
+        if (daftarSewa.isEmpty()) {
             System.out.println("Belum ada data penyewaan.");
             return;
         }
-        for (Penyewaan p : service.getDaftarSewa()) {
+        for (Penyewaan p : daftarSewa) {
             System.out.println("Kode Sewa   : " + p.getKodeSewa());
             System.out.println("ID Cust     : " + p.getIdCust());
             System.out.println("Nama Cust   : " + p.getNamaCust());
@@ -239,16 +246,16 @@ public class View {
         while (true) {
             int pilihan = inputAngka("Pilihan (1-2): ");
             if (pilihan == 1) {
-                return TipeSewa.PER_3_JAM;
+                return TipeSewa.per3jam;
             } else if (pilihan == 2) {
-                return TipeSewa.HARIAN;
+                return TipeSewa.Harian;
             }
             System.out.println("Error! Pilih 1 atau 2!");
         }
     }
 
     private int inputDurasi(TipeSewa tipe) {
-        if (tipe == TipeSewa.PER_3_JAM) {
+        if (tipe == TipeSewa.per3jam) {
             System.out.println("Paket: 1 = 3 jam, 2 = 6 jam");
             while (true) {
                 int paket = inputAngka("Pilih paket (1-2): ");
